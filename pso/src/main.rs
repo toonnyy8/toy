@@ -1,4 +1,4 @@
-use rand::{self, prelude::SliceRandom};
+use rand::{self};
 
 trait Layer {
     fn forward(&self, inps: &Vec<f32>) -> Vec<f32>;
@@ -16,10 +16,10 @@ struct Linear {
 impl Linear {
     fn new(inp_size: usize, out_size: usize, use_bias: bool) -> Linear {
         let weights: Vec<f32> = (0..inp_size * out_size)
-            .map(|idx| rand::random::<f32>())
+            .map(|_| rand::random::<f32>())
             .collect::<Vec<f32>>();
         let biases = (0..out_size)
-            .map(|idx| rand::random::<f32>())
+            .map(|_| rand::random::<f32>())
             .collect::<Vec<f32>>();
         Linear {
             inp_size,
@@ -146,7 +146,7 @@ impl Particle {
         let net = Net::new();
         let pbest = net.get_weights();
         let pbest_loss = xor_loss(&net);
-        let v = (0..pbest.len()).map(|idx| rand::random::<f32>()).collect();
+        let v = (0..pbest.len()).map(|_| rand::random::<f32>()).collect();
         Self {
             net,
             pbest,
@@ -200,7 +200,7 @@ struct Swarm {
 impl Swarm {
     fn new(particle_num: usize, v_max: f32, w: f32, c1: f32, c2: f32) -> Self {
         let particle_vec = (0..particle_num)
-            .map(|idx| Particle::new())
+            .map(|_| Particle::new())
             .collect::<Vec<_>>();
         let mut gbest = particle_vec[0].pbest.clone();
         let mut gbest_loss = particle_vec[0].pbest_loss;
