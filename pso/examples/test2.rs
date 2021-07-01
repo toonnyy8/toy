@@ -100,5 +100,4 @@ fn main() {
         .prl()
         .to_seq(&|xs: [Tensor; 2]| Tensor { data: vec![0.0] });
     let m2 = Seq::new(lin).srl(lin).srl(lin);
-    let a = 1;
 }
