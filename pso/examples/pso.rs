@@ -3,7 +3,9 @@
 use num_traits;
 use rand::Rng;
 use rand_distr::{Distribution, Normal, NormalError};
+use std::ops;
 
+#[derive(Debug, Clone)]
 struct Tensor<Ax: Axis, Dtype: num_traits::NumOps>
 where
     [usize; Ax::dim]: Sized,
@@ -13,7 +15,7 @@ where
     _ax: std::marker::PhantomData<Ax>,
 }
 
-impl<Ax: Axis, Dtype: num_traits::NumOps + num_traits::NumCast> Tensor<Ax, Dtype>
+impl<Ax: Axis, Dtype: num_traits::NumOps + num_traits::NumCast + Copy> Tensor<Ax, Dtype>
 where
     [usize; Ax::dim]: Sized,
 {
@@ -28,6 +30,25 @@ where
 
         Self {
             shape: shape.clone(),
+            data,
+            _ax: std::marker::PhantomData,
+        }
+    }
+}
+
+impl<Ax: Axis, Dtype: num_traits::NumOps + num_traits::NumCast + Copy> ops::Add<&Tensor<Ax, Dtype>>
+    for &Tensor<Ax, Dtype>
+where
+    [usize; Ax::dim]: Sized,
+{
+    type Output = Tensor<Ax, Dtype>;
+
+    fn add(self, other: &Tensor<Ax, Dtype>) -> Tensor<Ax, Dtype> {
+        let data = (0..self.data.len())
+            .map(|idx| self.data[idx] + other.data[idx])
+            .collect();
+        Tensor::<Ax, Dtype> {
+            shape: self.shape.clone(),
             data,
             _ax: std::marker::PhantomData,
         }
@@ -49,6 +70,7 @@ impl<Ax: Axis> Axis for I<Ax> {
 }
 
 fn main() {
-    let t = Tensor::<I<I>, f32>::rand(&[2, 3]);
-    println!("hi! {}", 123)
+    let t = &Tensor::<I<I>, f32>::rand(&[2, 3]);
+    let t2 = t + t;
+    println!("{:?}", t2.data)
 }
