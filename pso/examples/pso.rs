@@ -1,31 +1,29 @@
 #![feature(const_generics)]
 #![feature(const_evaluatable_checked)]
 use num_traits;
-use rand::Rng;
-use rand_distr::{Distribution, Normal, NormalError};
+use rand_distr::{Distribution, Normal};
 use std::ops;
 
-#[derive(Debug, Clone)]
 struct Tensor<Ax: Axis, Dtype: num_traits::NumOps>
 where
-    [usize; Ax::dim]: Sized,
+    [usize; Ax::DIM]: Sized,
 {
-    shape: [usize; Ax::dim],
+    shape: [usize; Ax::DIM],
     data: Vec<Dtype>,
     _ax: std::marker::PhantomData<Ax>,
 }
 
 impl<Ax: Axis, Dtype: num_traits::NumOps + num_traits::NumCast + Copy> Tensor<Ax, Dtype>
 where
-    [usize; Ax::dim]: Sized,
+    [usize; Ax::DIM]: Sized,
 {
-    fn rand(shape: &[usize; Ax::dim]) -> Self {
+    fn rand(shape: &[usize; Ax::DIM]) -> Self {
         let mut rng = rand::thread_rng();
         let normal = Normal::new(0., 1.).unwrap();
 
         let size = shape.iter().fold(1, |a, b| a * b);
         let data = (0..size)
-            .map(|idx| num_traits::cast(normal.sample(&mut rng)).unwrap())
+            .map(|_| num_traits::cast(normal.sample(&mut rng)).unwrap())
             .collect::<Vec<Dtype>>();
 
         Self {
@@ -39,7 +37,7 @@ where
 impl<Ax: Axis, Dtype: num_traits::NumOps + num_traits::NumCast + Copy> ops::Add<&Tensor<Ax, Dtype>>
     for &Tensor<Ax, Dtype>
 where
-    [usize; Ax::dim]: Sized,
+    [usize; Ax::DIM]: Sized,
 {
     type Output = Tensor<Ax, Dtype>;
 
@@ -56,17 +54,17 @@ where
 }
 
 trait Axis {
-    const dim: usize;
+    const DIM: usize;
 }
 struct Nil {}
 impl Axis for Nil {
-    const dim: usize = 0;
+    const DIM: usize = 0;
 }
 struct I<Ax: Axis = Nil> {
     _ax: std::marker::PhantomData<Ax>,
 }
 impl<Ax: Axis> Axis for I<Ax> {
-    const dim: usize = Ax::dim + 1;
+    const DIM: usize = Ax::DIM + 1;
 }
 
 fn main() {
