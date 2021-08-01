@@ -38,3 +38,7 @@
 ![Six, size=28](./img/six_28.png "Six, size=28")
 ![Six, size=128](./img/six_128.png "Six, size=128")
 ![Six, size=256](./img/six_256.png "Six, size=256")
+
+## todo
+
+目前於 Cifar10 的生成效果並不理想，要研究如何應用在複雜的資料集上。
